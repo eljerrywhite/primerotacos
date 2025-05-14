@@ -1,0 +1,2 @@
+entrypoint = "index.js"
+run = "npm install && node index.js"

@@ -35,6 +35,11 @@ const Taqueria = mongoose.model("Taqueria", taqSchema);
 // Ruta raíz
 app.get("/", (req, res) => res.send("API de Taquerías OK"));
 
+// Health‐check para UptimeRobot
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 // GET real
 app.get("/taquerias", async (req, res) => {
   try {
@@ -72,4 +77,13 @@ app.post("/taquerias", async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`API corriendo en puerto ${port}`));
+// POST real…
+app.post("/taquerias", async (req, res) => {
+  // …
+});
+
+// Iniciar el servidor
+app.listen(port, () => {
+  console.log(`API corriendo en puerto ${port}`);
+});
+

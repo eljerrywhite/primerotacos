@@ -28,7 +28,8 @@ const taqSchema = new mongoose.Schema({
   lugar:             { type: Number, required: true, min: 1, max: 5 },
   calificacionFinal: { type: Number },
   ubicacion:         { type: String },
-  especialidad:      { type: String },
+  especialidad: { type: String },        // Tagline individual (temporal)
+  taglines: [{ type: String }],          // Array de todos los taglines
   direccion:         { type: String },
   colonia:           { type: String },
   alcaldia:          { type: String },
@@ -58,6 +59,52 @@ app.get("/taquerias", async (req, res) => {
 app.post("/taquerias", async (req, res) => {
   try {
     const { nombre, calidad, servicio, lugar, ubicacion, especialidad, direccion, colonia, alcaldia } = req.body;
+    
+// Si es actualización, agregar el nuevo tagline al array
+if (doc) {
+  const nC = (doc.calidad + c)/2;
+  const nS = (doc.servicio + s)/2;
+  const nL = (doc.lugar + l)/2;
+  
+  // Agregar nuevo tagline al array si existe
+  const updatedTaglines = doc.taglines || [];
+  if (especialidad && !updatedTaglines.includes(especialidad)) {
+    updatedTaglines.push(especialidad);
+  }
+  
+  doc = await Taqueria.findByIdAndUpdate(
+    doc._id,
+    { 
+      calidad: nC, 
+      servicio: nS, 
+      lugar: nL, 
+      calificacionFinal: calcFinal(nC), 
+      ubicacion: ubicacion||doc.ubicacion,
+      direccion: direccion||doc.direccion,
+      colonia: colonia||doc.colonia,
+      alcaldia: alcaldia||doc.alcaldia,
+      taglines: updatedTaglines,
+      especialidad: especialidad // mantener por compatibilidad
+    },
+    { new: true }
+  );
+  // ... resto del código
+}
+
+// Para nueva taquería
+const newDoc = new Taqueria({ 
+  nombre, 
+  calidad: c, 
+  servicio: s, 
+  lugar: l, 
+  calificacionFinal: calcFinal(c), 
+  ubicacion,
+  especialidad,
+  direccion,
+  colonia,
+  alcaldia,
+  taglines: especialidad ? [especialidad] : [] // crear array con el primer tagline
+});
     const c = Number(calidad), s = Number(servicio), l = Number(lugar);
     const calcFinal = x => Math.round(x * 0.7 + s * 0.2 + l * 0.1);
 

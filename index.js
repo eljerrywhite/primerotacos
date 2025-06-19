@@ -28,6 +28,10 @@ const taqSchema = new mongoose.Schema({
   lugar:             { type: Number, required: true, min: 1, max: 5 },
   calificacionFinal: { type: Number },
   ubicacion:         { type: String },
+  especialidad:      { type: String },
+  direccion:         { type: String },
+  colonia:           { type: String },
+  alcaldia:          { type: String },
   fecha:             { type: Date, default: Date.now },
 });
 const Taqueria = mongoose.model("Taqueria", taqSchema);
@@ -53,7 +57,7 @@ app.get("/taquerias", async (req, res) => {
 // POST real
 app.post("/taquerias", async (req, res) => {
   try {
-    const { nombre, calidad, servicio, lugar, ubicacion } = req.body;
+    const { nombre, calidad, servicio, lugar, ubicacion, especialidad, direccion, colonia, alcaldia } = req.body;
     const c = Number(calidad), s = Number(servicio), l = Number(lugar);
     const calcFinal = x => Math.round(x * 0.7 + s * 0.2 + l * 0.1);
 
@@ -69,7 +73,18 @@ app.post("/taquerias", async (req, res) => {
       );
       return res.json({ mensaje: "Taquería actualizada", taqueria: doc, esActualizacion: true });
     }
-    const newDoc = new Taqueria({ nombre, calidad: c, servicio: s, lugar: l, calificacionFinal: calcFinal(c), ubicacion });
+    const newDoc = new Taqueria({ 
+  nombre, 
+  calidad: c, 
+  servicio: s, 
+  lugar: l, 
+  calificacionFinal: calcFinal(c), 
+  ubicacion,
+  especialidad,
+  direccion,
+  colonia,
+  alcaldia
+});
     await newDoc.save();
     res.json({ mensaje: "Taquería creada", taqueria: newDoc, esActualizacion: false });
   } catch (e) {

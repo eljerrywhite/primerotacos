@@ -139,11 +139,6 @@ const newDoc = new Taqueria({
   }
 });
 
-// POST real…
-app.post("/taquerias", async (req, res) => {
-  // …
-});
-
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`API corriendo en puerto ${port}`);

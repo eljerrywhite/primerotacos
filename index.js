@@ -1,4 +1,3 @@
-// index.js
 require("dotenv").config();
 const express = require("express");
 const cors    = require("cors");
@@ -55,85 +54,74 @@ app.get("/taquerias", async (req, res) => {
   }
 });
 
-// POST real
+// POST real - VERSIÓN LIMPIA Y FUNCIONAL
 app.post("/taquerias", async (req, res) => {
   try {
     const { nombre, calidad, servicio, lugar, ubicacion, especialidad, direccion, colonia, alcaldia } = req.body;
     
-// Si es actualización, agregar el nuevo tagline al array
-if (doc) {
-  const nC = (doc.calidad + c)/2;
-  const nS = (doc.servicio + s)/2;
-  const nL = (doc.lugar + l)/2;
-  
-  // Agregar nuevo tagline al array si existe
-  const updatedTaglines = doc.taglines || [];
-  if (especialidad && !updatedTaglines.includes(especialidad)) {
-    updatedTaglines.push(especialidad);
-  }
-  
-  doc = await Taqueria.findByIdAndUpdate(
-    doc._id,
-    { 
-      calidad: nC, 
-      servicio: nS, 
-      lugar: nL, 
-      calificacionFinal: calcFinal(nC), 
-      ubicacion: ubicacion||doc.ubicacion,
-      direccion: direccion||doc.direccion,
-      colonia: colonia||doc.colonia,
-      alcaldia: alcaldia||doc.alcaldia,
-      taglines: updatedTaglines,
-      especialidad: especialidad // mantener por compatibilidad
-    },
-    { new: true }
-  );
-  // ... resto del código
-}
-
-// Para nueva taquería
-const newDoc = new Taqueria({ 
-  nombre, 
-  calidad: c, 
-  servicio: s, 
-  lugar: l, 
-  calificacionFinal: calcFinal(c), 
-  ubicacion,
-  especialidad,
-  direccion,
-  colonia,
-  alcaldia,
-  taglines: especialidad ? [especialidad] : [] // crear array con el primer tagline
-});
     const c = Number(calidad), s = Number(servicio), l = Number(lugar);
     const calcFinal = x => Math.round(x * 0.7 + s * 0.2 + l * 0.1);
-
+    
     let doc = await Taqueria.findOne({ nombre });
+    
+    // Si es actualización, promediar calificaciones y agregar tagline
     if (doc) {
-      const nC = (doc.calidad + c)/2;
-      const nS = (doc.servicio + s)/2;
-      const nL = (doc.lugar + l)/2;
+      const nC = (doc.calidad + c) / 2;
+      const nS = (doc.servicio + s) / 2;
+      const nL = (doc.lugar + l) / 2;
+      
+      // Agregar nuevo tagline al array si existe y no está duplicado
+      const updatedTaglines = doc.taglines || [];
+      if (especialidad && !updatedTaglines.includes(especialidad)) {
+        updatedTaglines.push(especialidad);
+      }
+      
       doc = await Taqueria.findByIdAndUpdate(
         doc._id,
-        { calidad: nC, servicio: nS, lugar: nL, calificacionFinal: calcFinal(nC), ubicacion: ubicacion||doc.ubicacion },
+        { 
+          calidad: nC, 
+          servicio: nS, 
+          lugar: nL, 
+          calificacionFinal: calcFinal(nC), 
+          ubicacion: ubicacion || doc.ubicacion,
+          direccion: direccion || doc.direccion,
+          colonia: colonia || doc.colonia,
+          alcaldia: alcaldia || doc.alcaldia,
+          taglines: updatedTaglines,
+          especialidad: especialidad // mantener por compatibilidad durante transición
+        },
         { new: true }
       );
-      return res.json({ mensaje: "Taquería actualizada", taqueria: doc, esActualizacion: true });
+      
+      return res.json({ 
+        mensaje: "Taquería actualizada", 
+        taqueria: doc, 
+        esActualizacion: true 
+      });
     }
+    
+    // Para nueva taquería
     const newDoc = new Taqueria({ 
-  nombre, 
-  calidad: c, 
-  servicio: s, 
-  lugar: l, 
-  calificacionFinal: calcFinal(c), 
-  ubicacion,
-  especialidad,
-  direccion,
-  colonia,
-  alcaldia
-});
+      nombre, 
+      calidad: c, 
+      servicio: s, 
+      lugar: l, 
+      calificacionFinal: calcFinal(c), 
+      ubicacion,
+      especialidad,
+      direccion,
+      colonia,
+      alcaldia,
+      taglines: especialidad ? [especialidad] : [] // crear array con el primer tagline
+    });
+    
     await newDoc.save();
-    res.json({ mensaje: "Taquería creada", taqueria: newDoc, esActualizacion: false });
+    res.json({ 
+      mensaje: "Taquería creada", 
+      taqueria: newDoc, 
+      esActualizacion: false 
+    });
+    
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -143,4 +131,3 @@ const newDoc = new Taqueria({
 app.listen(port, () => {
   console.log(`API corriendo en puerto ${port}`);
 });
-

@@ -127,6 +127,20 @@ app.post("/taquerias", async (req, res) => {
   }
 });
 
+// ENDPOINT TEMPORAL PARA LIMPIAR BASE DE DATOS
+app.delete("/reset-all", async (req, res) => {
+  try {
+    const result = await Taqueria.deleteMany({});
+    res.json({ 
+      mensaje: "🗑️ Base de datos limpiada completamente", 
+      eliminadas: result.deletedCount,
+      timestamp: new Date().toISOString()
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Iniciar el servidor
 app.listen(port, () => {
   console.log(`API corriendo en puerto ${port}`);

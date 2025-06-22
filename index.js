@@ -60,7 +60,8 @@ app.post("/taquerias", async (req, res) => {
     const { nombre, calidad, servicio, lugar, ubicacion, especialidad, direccion, colonia, alcaldia } = req.body;
     
     const c = Number(calidad), s = Number(servicio), l = Number(lugar);
-    const calcFinal = x => Math.round(x * 0.7 + s * 0.2 + l * 0.1);
+    const calcFinal = (calidad, servicio, lugar) => 
+  Number((calidad * 0.7 + servicio * 0.2 + lugar * 0.1).toFixed(1));
     
     let doc = await Taqueria.findOne({ nombre });
     
@@ -82,7 +83,7 @@ app.post("/taquerias", async (req, res) => {
           calidad: nC, 
           servicio: nS, 
           lugar: nL, 
-          calificacionFinal: calcFinal(nC), 
+          calificacionFinal: calcFinal(nC, nS, nL),
           ubicacion: ubicacion || doc.ubicacion,
           direccion: direccion || doc.direccion,
           colonia: colonia || doc.colonia,
@@ -106,7 +107,7 @@ app.post("/taquerias", async (req, res) => {
       calidad: c, 
       servicio: s, 
       lugar: l, 
-      calificacionFinal: calcFinal(c), 
+     calificacionFinal: calcFinal(c, s, l),
       ubicacion,
       especialidad,
       direccion,
